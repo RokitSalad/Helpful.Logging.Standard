@@ -49,10 +49,11 @@ jobs:
 - job: PublishLocal
   displayName: Publish to local feed
   dependsOn: Build
-  condition: and(succeeded(), ne(variables['build.sourceBranch'], 'refs/heads/master'))
+  condition: succeeded()
   steps:
 
   - download: current
+    displayName: Retrieve artifact
     artifact: Helpful.Logging.Standard
 
   - task: DotNetCoreCLI@2
@@ -70,6 +71,7 @@ jobs:
   steps:
 
   - download: current
+    displayName: Retrieve artifact
     artifact: Helpful.Logging.Standard
 
   - task: DotNetCoreCLI@2
