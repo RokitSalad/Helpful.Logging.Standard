@@ -5,7 +5,7 @@
 name: 1.0.$(Rev:r)
 
 trigger:
-- master
+- *
 
 pool:
   vmImage: 'windows-latest'
@@ -16,64 +16,56 @@ variables:
   buildConfiguration: 'Release'
   buildVersion: 1.0.$(Rev:r)
 
-stages:
-- stage: Dev
-  jobs:
-  - job: Build
-    steps:
+jobs:
 
-    - task: DotNetCoreCLI@2
+- job: Build
+  steps:
+  
+  - task: DotNetCoreCLI@2
       displayName: 'dotnet restore'
       inputs:
-        command: 'restore'
-        feedsToUse: 'select'
-        projects: '**/*.csproj'
-
-    - task: DotNetCoreCLI@2
+      command: 'restore'
+      feedsToUse: 'select'
+      projects: '**/*.csproj'
+  
+  - task: DotNetCoreCLI@2
       displayName: 'dotnet build'
       inputs:
-        command: 'build'
-        projects: '**/*.csproj'
-    
-    - task: DotNetCoreCLI@2
+      command: 'build'
+      projects: '**/*.csproj'
+      
+  - task: DotNetCoreCLI@2
       displayName: 'dotnet pack'
       inputs:
-        command: 'pack'
-        packagesToPack: '**/Helpful.Logging.Standard.csproj'
-        versioningScheme: 'byBuildNumber'
-        verbosityPack: 'Diagnostic'
-
-    - publish: '$(Build.ArtifactStagingDirectory)'
+      command: 'pack'
+      packagesToPack: '**/Helpful.Logging.Standard.csproj'
+      versioningScheme: 'byBuildNumber'
+      verbosityPack: 'Diagnostic'
+  
+  - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: Helpful.Logging.Standard
 
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet push'
-      inputs:
-        command: 'push'
-        packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-        nuGetFeedType: 'internal'
-        publishVstsFeed: '40f82a44-ccb3-4b97-b78a-4f61f521b9c3/e3313fb1-271b-4c42-99cc-f1a0935904b2'
+- job: Publish to local feed
+  dependsOn: Build
+  condition: and(succeeded(), ne(variables['build.sourceBranch'], 'refs/heads/master'))
+  steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet push'
+    inputs:
+      command: 'push'
+      packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+      nuGetFeedType: 'internal'
+      publishVstsFeed: '40f82a44-ccb3-4b97-b78a-4f61f521b9c3/e3313fb1-271b-4c42-99cc-f1a0935904b2'
 
-- stage: Release
-  dependsOn: Dev
-  jobs:
-  - deployment: PublishPublic
-    displayName: 'Publish to Nuget.org'
-    environment: 'Public Nuget'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: current
-            artifact: Helpful.Logging.Standard
-          - task: DotNetCoreCLI@2
-            displayName: 'nuget push'
-            inputs:
-              command: custom
-              custom: nuget
-              arguments: >
-                push $(Pipeline.Workspace)/**/*.nupkg
-                -s $(NugetOrgServerUrl)
-                -k $(NugetOrgApiKey)
-
-          
+- job: Publish to Nuget.org
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+  - task: DotNetCoreCLI@2
+    displayName: 'nuget push'
+    inputs:
+        command: custom
+        custom: nuget
+        arguments: >
+        push $(Build.ArtifactStagingDirectory)/**/*.nupkg
+        -s $(NugetOrgServerUrl)
+        -k $(NugetOrgApiKey)
