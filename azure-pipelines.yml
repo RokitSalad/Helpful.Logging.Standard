@@ -51,11 +51,15 @@ jobs:
   dependsOn: Build
   condition: and(succeeded(), ne(variables['build.sourceBranch'], 'refs/heads/master'))
   steps:
+
+  - download: current
+    artifact: Helpful.Logging.Standard
+
   - task: DotNetCoreCLI@2
     displayName: 'dotnet push'
     inputs:
       command: 'push'
-      packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+      packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg'
       nuGetFeedType: 'internal'
       publishVstsFeed: '40f82a44-ccb3-4b97-b78a-4f61f521b9c3/e3313fb1-271b-4c42-99cc-f1a0935904b2'
 
@@ -64,12 +68,16 @@ jobs:
   dependsOn: Build
   condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
   steps:
+
+  - download: current
+    artifact: Helpful.Logging.Standard
+
   - task: DotNetCoreCLI@2
     displayName: 'nuget push'
     inputs:
       command: custom
       custom: nuget
       arguments: >
-        push $(Build.ArtifactStagingDirectory)/**/*.nupkg
+        push $(Pipeline.Workspace)/**/*.nupkg
         -s $(NugetOrgServerUrl)
         -k $(NugetOrgApiKey)
