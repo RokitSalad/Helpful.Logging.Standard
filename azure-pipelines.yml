@@ -34,6 +34,16 @@ jobs:
     inputs:
       command: 'build'
       projects: '**/*.csproj'
+
+  - task: VSTest@2
+    displayName: test
+    inputs:
+      testSelector: 'testAssemblies'
+      testAssemblyVer2: |
+        **\*tests*.dll
+        !**\*TestAdapter.dll
+        !**\obj\**
+      searchFolder: '$(System.DefaultWorkingDirectory)'
       
   - task: DotNetCoreCLI@2
     displayName: 'dotnet pack'
