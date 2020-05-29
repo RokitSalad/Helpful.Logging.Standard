@@ -8,7 +8,7 @@ namespace SampleWebApp
     {
         public static void Main(string[] args)
         {
-            ConfigureLogger.StandardSetup("SampleWebApp", () => CreateHostBuilder(args).Build().Run());
+            ConfigureLogger.StandardSetup(() => CreateHostBuilder(args).Build().Run());
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

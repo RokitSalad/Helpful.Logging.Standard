@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Serilog;
 
 namespace Helpful.Logging.Standard
@@ -10,7 +11,15 @@ namespace Helpful.Logging.Standard
 
         public static ILogger GetLogger(this object loggingSource)
         {
-            LoggingContext.Set(LOG_KEY_SOURCE, loggingSource.GetType());
+            switch (loggingSource)
+            {
+                case Assembly a:
+                    LoggingContext.Set(LOG_KEY_SOURCE, a.FullName);
+                    break;
+                case { } s:
+                    LoggingContext.Set(LOG_KEY_SOURCE, s.GetType());
+                    break;
+            }
             return Log.Logger;
         }
 

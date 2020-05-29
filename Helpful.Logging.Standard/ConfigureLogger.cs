@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Serilog;
 using Serilog.Formatting.Compact;
@@ -7,7 +8,7 @@ namespace Helpful.Logging.Standard
 {
     public class ConfigureLogger
     {
-        public static void StandardSetup(string applicationName, Action appInit = null, string logFileName = "log.txt")
+        public static void StandardSetup(Action appInit = null, string logFileName = "log.txt")
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
@@ -16,8 +17,10 @@ namespace Helpful.Logging.Standard
                 .Enrich.FromLogContext()
                 .CreateLogger();
 
-            LoggingContext.Set(LoggerExtensions.LOG_KEY_SOURCE, applicationName);
-            Log.Logger.LogDebugWithContext("Application {ApplicationName} is starting.", applicationName);
+
+            var entryAssembly = Assembly.GetEntryAssembly();
+            var executingAssembly = entryAssembly?.FullName;
+            entryAssembly.GetLogger().LogInformationWithContext("Application {ApplicationName} is starting.", executingAssembly);
 
             if (appInit != null)
             {
@@ -27,7 +30,7 @@ namespace Helpful.Logging.Standard
                 }
                 catch (Exception e)
                 {
-                    Log.Logger.LogFatalWithContext(e, "The application {ApplicationName} failed to start due to an exception.", applicationName);
+                    entryAssembly.GetLogger().LogFatalWithContext(e, "The application {ApplicationName} failed to start due to an exception.", executingAssembly);
                     throw;
                 }
             }

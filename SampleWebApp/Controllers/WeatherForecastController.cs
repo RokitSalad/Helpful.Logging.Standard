@@ -28,7 +28,7 @@ namespace SampleWebApp.Controllers
         public IEnumerable<WeatherForecast> Get()
         {
             LoggingContext.Set("some_key", Guid.NewGuid());
-            Log.Logger.LogWarningWithContext("this is info about {WhatHappened} logged via {LogProvider}", "!!bang!!", "Serilog");
+            this.GetLogger().LogWarningWithContext("this is info about {WhatHappened} logged via {LogProvider}", "!!bang!!", "Serilog");
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
