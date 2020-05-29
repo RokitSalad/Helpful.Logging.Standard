@@ -5,7 +5,8 @@
 name: 1.0.$(Rev:r)
 
 trigger:
-- *
+- master
+- dev
 
 pool:
   vmImage: 'windows-latest'
@@ -22,30 +23,31 @@ jobs:
   steps:
   
   - task: DotNetCoreCLI@2
-      displayName: 'dotnet restore'
-      inputs:
+    displayName: 'dotnet restore'
+    inputs:
       command: 'restore'
       feedsToUse: 'select'
       projects: '**/*.csproj'
   
   - task: DotNetCoreCLI@2
-      displayName: 'dotnet build'
-      inputs:
+    displayName: 'dotnet build'
+    inputs:
       command: 'build'
       projects: '**/*.csproj'
       
   - task: DotNetCoreCLI@2
-      displayName: 'dotnet pack'
-      inputs:
+    displayName: 'dotnet pack'
+    inputs:
       command: 'pack'
       packagesToPack: '**/Helpful.Logging.Standard.csproj'
       versioningScheme: 'byBuildNumber'
       verbosityPack: 'Diagnostic'
   
   - publish: '$(Build.ArtifactStagingDirectory)'
-      artifact: Helpful.Logging.Standard
+    artifact: Helpful.Logging.Standard
 
-- job: Publish to local feed
+- job: PublishLocal
+  displayName: Publish to local feed
   dependsOn: Build
   condition: and(succeeded(), ne(variables['build.sourceBranch'], 'refs/heads/master'))
   steps:
@@ -57,15 +59,17 @@ jobs:
       nuGetFeedType: 'internal'
       publishVstsFeed: '40f82a44-ccb3-4b97-b78a-4f61f521b9c3/e3313fb1-271b-4c42-99cc-f1a0935904b2'
 
-- job: Publish to Nuget.org
+- job: PublishPublic
+  displayName: Publish to Nuget.org
   dependsOn: Build
   condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+  steps:
   - task: DotNetCoreCLI@2
     displayName: 'nuget push'
     inputs:
-        command: custom
-        custom: nuget
-        arguments: >
+      command: custom
+      custom: nuget
+      arguments: >
         push $(Build.ArtifactStagingDirectory)/**/*.nupkg
         -s $(NugetOrgServerUrl)
         -k $(NugetOrgApiKey)
