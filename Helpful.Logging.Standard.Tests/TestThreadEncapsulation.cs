@@ -22,7 +22,7 @@ namespace Helpful.Logging.Standard.Tests
             var staticValueKey = "STATIC";
             var staticValue = "this value should be in all logs";
             LoggingContext.Set(staticValueKey, staticValue);
-            Parallel.For(1, 20000, (x) =>
+            Parallel.For(1, 10000, (x) =>
             {
                 LoggingContext.Set(key, x);
                 this.GetLogger().LogWarningWithContext("current number processing: {Number}", x);
