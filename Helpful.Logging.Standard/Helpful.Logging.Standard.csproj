@@ -3,6 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8</LangVersion>
+    <Authors>rokitsalad</Authors>
+    <Company>dobbs.technology</Company>
+    <Description>A package delivering simple logging ability to dotnet applications using Serilog.</Description>
+    <PackageProjectUrl>https://dev.azure.com/pete0159/Helpful.Libraries</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/RokitSalad/Helpful.Logging.Standard</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
