@@ -36,3 +36,6 @@ Any data added to the Helpful.Logging.Standard.LoggingContext will appear in the
 The LoggingContext uses LocalAsync so previously set values will persist into new threads, but subsequent changes will not propegate back.
 
 If you don't want to use Serilog or you don't want your logs in a json format, this library is not for you.
+
+## Build Status
+[![Build Status](https://dev.azure.com/pete0159/Helpful.Libraries/_apis/build/status/RokitSalad.Helpful.Logging.Standard?branchName=master)](https://dev.azure.com/pete0159/Helpful.Libraries/_build/latest?definitionId=5&branchName=master)
