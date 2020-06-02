@@ -9,6 +9,8 @@ namespace Helpful.Logging.Standard
     {
         public static void StandardSetup(Action appInit = null, string logFileName = "log.txt")
         {
+            Assembly entryAssembly;
+            string executingAssembly;
             try
             {
                 Log.Logger = new LoggerConfiguration()
@@ -19,26 +21,27 @@ namespace Helpful.Logging.Standard
                     .CreateLogger();
 
 
-                var entryAssembly = Assembly.GetEntryAssembly();
-                var executingAssembly = entryAssembly?.FullName;
+                entryAssembly = Assembly.GetEntryAssembly();
+                executingAssembly = entryAssembly?.FullName;
                 entryAssembly.GetLogger().LogInformationWithContext("Application {ApplicationName} is starting.", executingAssembly);
 
-                if (appInit != null)
-                {
-                    try
-                    {
-                        appInit();
-                    }
-                    catch (Exception e)
-                    {
-                        entryAssembly.GetLogger().LogFatalWithContext(e, "The application {ApplicationName} failed to start due to an exception.", executingAssembly);
-                        throw;
-                    }
-                }
             }
             catch (Exception e)
             {
                 throw new HelpfulLoggingConfigurationException("Failed to configure Helpful.Logging.Standard.", e);
+            }
+
+            if (appInit != null)
+            {
+                try
+                {
+                    appInit();
+                }
+                catch (Exception e)
+                {
+                    entryAssembly.GetLogger().LogFatalWithContext(e, "The application {ApplicationName} failed to start due to an exception.", executingAssembly);
+                    throw;
+                }
             }
         }
     }
