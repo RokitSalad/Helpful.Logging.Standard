@@ -23,7 +23,7 @@ namespace Helpful.Logging.Standard
 
                 entryAssembly = Assembly.GetEntryAssembly();
                 executingAssembly = entryAssembly?.FullName;
-                entryAssembly.GetLogger().LogInformationWithContext("Application {ApplicationName} is starting.", executingAssembly);
+                entryAssembly.GetLogger().LogInformationWithContext("Standard setup configured for application: {ApplicationName}.", executingAssembly);
 
             }
             catch (Exception e)
