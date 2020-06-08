@@ -12,10 +12,9 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-  buildVersion: 1.0.$(Rev:r)
+  - group: helpful-libraries-secrets
+  - name: buildConfiguration
+    value: 'Release'
 
 jobs:
 
@@ -33,6 +32,7 @@ jobs:
     displayName: 'dotnet build'
     inputs:
       command: 'build'
+      configuration: $(buildConfiguration)
       projects: '**/*.csproj'
 
   - task: VSTest@2
@@ -72,7 +72,7 @@ jobs:
       command: 'push'
       packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg'
       nuGetFeedType: 'internal'
-      publishVstsFeed: '40f82a44-ccb3-4b97-b78a-4f61f521b9c3/e3313fb1-271b-4c42-99cc-f1a0935904b2'
+      publishVstsFeed: '$(helpful-libraries-feed-allbuilds-uri)'
 
 - job: PublishPublic
   displayName: Publish to Nuget.org
