@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Reflection;
 using Serilog;
+using Serilog.Events;
 using Serilog.Formatting.Compact;
 
 namespace Helpful.Logging.Standard
 {
     public class ConfigureLogger
     {
-        public static void StandardSetup(Action appInit = null, string logFileName = "log.txt")
+        public static void StandardSetup(Action appInit = null, LogEventLevel logLevel = LogEventLevel.Information, string logFileName = "log.txt")
         {
             Assembly entryAssembly;
             string executingAssembly;
             try
             {
                 Log.Logger = new LoggerConfiguration()
-                    .MinimumLevel.Information()
+                    .MinimumLevel.Is(logLevel)
                     .WriteTo.Console()
                     .WriteTo.File(new CompactJsonFormatter(), logFileName, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true)
                     .Enrich.FromLogContext()
